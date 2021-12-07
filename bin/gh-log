@@ -27,7 +27,7 @@ set -e
 
 # : ${GH_ACCESS_TOKEN:=`gh-creds token`}
 # : ${GH_LOGIN:=`gh-creds user`}
-: ${GH_LOGIN:=tclem}
+: ${GH_LOGIN:=SamMorrowDrums}
 
 org=""
 
@@ -95,7 +95,7 @@ function formatted_issues() {
   while true; do
     curl="$base_url&page=$page&q=$q"
     echo $curl >&2
-    out=`curl -n -s "$curl"`
+    out=`curl -n -s -u ${GH_LOGIN}:${GH_ACCESS_TOKEN} "$curl"`
 
     if [ `echo "$out" | jq -r '.items | length'` -eq 0 ]; then
       echo "No more pages" >&2
