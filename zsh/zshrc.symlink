@@ -1,0 +1,82 @@
+export SHELL=/usr/local/bin/zsh
+
+# your project folder that we can `c [tab]` to
+export PROJECTS=~/github
+
+# shortcut to this dotfiles path is $ZSH
+export ZSH=$PROJECTS/dotfiles
+
+# source every .zsh file in this rep
+for config_file ($ZSH/**/*.zsh) source $config_file
+
+# ZSH tab completions for git and hub.
+fpath=(/usr/local/share/zsh-completions $fpath)
+fpath=(/usr/local/share/zsh/site-functions $fpath)
+
+# Completions for gh
+test -e $(which gh) && eval "$(gh completion -s zsh)"
+
+# use .localrc for SUPER SECRET CRAP that you don't
+# want in your public, versioned repo.
+if [[ -a ~/.localrc ]]
+then
+  source ~/.localrc
+fi
+
+# iTerm window title
+DISABLE_AUTO_TITLE="true"
+function precmd () {
+  window_title="\033]0;${PWD##*/}\007"
+  echo -ne "$window_title"
+}
+
+# initialize autocomplete here, otherwise functions won't be loaded
+autoload -U compinit
+compinit
+
+setopt autolist
+
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey '^Xe' edit-command-line
+
+# direnv
+test -e "$(which direnv)" && eval "$(direnv hook zsh)"
+
+# rbenv
+test -e "$(which rbenv)" && eval "$(rbenv init -)"
+
+# node and npm, specifically not using a version manager as I only work with
+# node in the tree-sitter project.
+export PATH="/usr/local/opt/node@10/bin:$PATH"
+export PATH="$PATH:./node_modules/.bin"
+
+# Setup go
+# export GOPATH=$HOME/go
+# export GOBIN=$GOPATH/bin
+# export GOROOT=/usr/local/opt/go/libexec
+#export GOFLAGS=-mod=vendor
+# export PATH=$PATH:$GOPATH/bin
+# export PATH=$PATH:$GOROOT/bin
+export PATH=$PATH:$HOME/go/bin
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# For donkey self driving car only
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+# __conda_setup="$('/usr/local/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+#    eval "$__conda_setup"
+# else
+#    if [ -f "/usr/local/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+#        . "/usr/local/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+#    else
+#        export PATH="/usr/local/Caskroom/miniconda/base/bin:$PATH"
+#    fi
+# fi
+# unset __conda_setup
+# <<< conda initialize <<<
+
+# Build semantic with bazel
+export BAZEL_USE_CPP_ONLY_TOOLCHAIN=1
